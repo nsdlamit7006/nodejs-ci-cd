@@ -1,0 +1,44 @@
+name: Node.js CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests
+        run: npm test
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to Windows Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd C:\nodejs-ci-cd
+            git pull origin main
+            npm install
+            pm2 restart server.js --name "nodejs-app"
