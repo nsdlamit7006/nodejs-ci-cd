@@ -4,6 +4,6 @@ const userController = require('../controllers/userController');
 
 router.post('/register', userController.register);
 router.post('/register', userController.register1);
-router.post('/register', userController.register1);
+router.post('/register', userController.register12);
 
 module.exports = router;
